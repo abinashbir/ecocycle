@@ -1,4 +1,4 @@
-# Circle Connect
+# EcoCycle
 
 This project is a React application built with Vite.
 

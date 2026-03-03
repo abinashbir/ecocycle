@@ -18,7 +18,7 @@ const SignIn = () => {
             <div className="max-w-md w-full space-y-8 p-8 border rounded-xl shadow-sm bg-card">
                 <div className="text-center">
                     <h2 className="mt-6 text-3xl font-extrabold text-foreground">
-                        Sign in to Circle Connect
+                        Sign in to EcoCycle
                     </h2>
                     <p className="mt-2 text-sm text-muted-foreground">
                         Get started with your waste management journey
