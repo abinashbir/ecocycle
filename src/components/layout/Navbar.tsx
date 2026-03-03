@@ -1,19 +1,24 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { 
-  Recycle, 
-  Menu, 
-  X, 
-  ShoppingBag, 
-  MessageCircle, 
+import { useAuth } from "@/contexts/AuthContext";
+import {
+  Recycle,
+  Menu,
+  X,
+  ShoppingBag,
+  MessageCircle,
   LayoutDashboard,
-  Leaf
+  Leaf,
+  LogOut,
+  User
 } from "lucide-react";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, signOut } = useAuth();
 
   const navLinks = [
     { path: "/", label: "Home", icon: Leaf },
@@ -33,7 +38,7 @@ const Navbar = () => {
             <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-soft group-hover:shadow-card transition-shadow">
               <Recycle className="w-6 h-6 text-primary-foreground" />
             </div>
-            <span className="text-xl font-bold text-foreground">EcoCycle</span>
+            <span className="text-xl font-bold text-foreground">Circle Connect</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -54,8 +59,24 @@ const Navbar = () => {
 
           {/* Auth Buttons */}
           <div className="hidden md:flex items-center gap-3">
-            <Button variant="ghost" size="sm">Sign In</Button>
-            <Button variant="hero" size="sm">Get Started</Button>
+            {user ? (
+              <div className="flex items-center gap-3">
+                <span className="text-sm font-medium">{user.displayName || user.email}</span>
+                <Button variant="ghost" size="sm" onClick={() => signOut()}>
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Sign Out
+                </Button>
+              </div>
+            ) : (
+              <>
+                <Link to="/signin">
+                  <Button variant="ghost" size="sm">Sign In</Button>
+                </Link>
+                <Link to="/signin">
+                  <Button variant="hero" size="sm">Get Started</Button>
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -83,8 +104,20 @@ const Navbar = () => {
                 </Link>
               ))}
               <div className="flex gap-2 pt-4 border-t border-border mt-2">
-                <Button variant="ghost" className="flex-1">Sign In</Button>
-                <Button variant="hero" className="flex-1">Get Started</Button>
+                {user ? (
+                  <Button variant="ghost" className="flex-1" onClick={() => signOut()}>
+                    Sign Out
+                  </Button>
+                ) : (
+                  <>
+                    <Link to="/signin" className="flex-1">
+                      <Button variant="ghost" className="w-full">Sign In</Button>
+                    </Link>
+                    <Link to="/signin" className="flex-1">
+                      <Button variant="hero" className="w-full">Get Started</Button>
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
           </div>

@@ -6,6 +6,7 @@ import { MapPin, Star, MessageCircle } from "lucide-react";
 interface ItemCardProps {
   item: MarketplaceItem;
   onContact?: (item: MarketplaceItem) => void;
+  isOwner?: boolean;
 }
 
 const categoryColors: Record<string, string> = {
@@ -25,7 +26,7 @@ const sellerTypeColors: Record<string, string> = {
   recycler: "bg-eco-recycler/10 text-eco-recycler border-eco-recycler/20",
 };
 
-const ItemCard = ({ item, onContact }: ItemCardProps) => {
+const ItemCard = ({ item, onContact, isOwner }: ItemCardProps) => {
   return (
     <div className="group bg-card rounded-2xl overflow-hidden shadow-soft border border-border hover:shadow-card transition-all duration-300 hover:-translate-y-1">
       {/* Image */}
@@ -50,7 +51,7 @@ const ItemCard = ({ item, onContact }: ItemCardProps) => {
         <h3 className="font-bold text-lg mb-2 line-clamp-2 group-hover:text-primary transition-colors">
           {item.title}
         </h3>
-        
+
         <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
           {item.description}
         </p>
@@ -89,14 +90,20 @@ const ItemCard = ({ item, onContact }: ItemCardProps) => {
           <Badge variant="outline" className={sellerTypeColors[item.seller.type]}>
             {item.seller.type}
           </Badge>
-          <Button 
-            size="sm" 
-            onClick={() => onContact?.(item)}
-            className="gap-2"
-          >
-            <MessageCircle className="w-4 h-4" />
-            Contact
-          </Button>
+          {isOwner ? (
+            <Badge variant="secondary" className="gap-2">
+              Your Item
+            </Badge>
+          ) : (
+            <Button
+              size="sm"
+              onClick={() => onContact?.(item)}
+              className="gap-2"
+            >
+              <MessageCircle className="w-4 h-4" />
+              Contact
+            </Button>
+          )}
         </div>
       </div>
     </div>

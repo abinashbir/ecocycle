@@ -1,39 +1,48 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import Navbar from "@/components/layout/Navbar";
 import ChatSidebar from "@/components/chat/ChatSidebar";
 import ChatWindow from "@/components/chat/ChatWindow";
-import { mockChatRooms, mockMessages } from "@/data/mockData";
-import { ChatMessage } from "@/types/marketplace";
+import { useChatRooms, useMessages, useSendMessage } from "@/hooks/useChat";
+
+import { useAuth } from "@/contexts/AuthContext";
 
 const Chat = () => {
+  const location = useLocation();
   const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
-  const [messages, setMessages] = useState<ChatMessage[]>(mockMessages);
-  
-  const currentUserId = "s4"; // Simulating logged in as EcoPlast Recyclers
-  const selectedRoom = mockChatRooms.find(room => room.id === selectedRoomId) || null;
+  const { user } = useAuth();
+  const currentUserId = user?.uid || "";
+
+  // Effect to select room from URL query param
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const roomId = searchParams.get("room");
+    if (roomId) {
+      setSelectedRoomId(roomId);
+    }
+  }, [location.search]);
+
+  const { data: rooms = [] } = useChatRooms();
+  const { data: messages = [] } = useMessages(selectedRoomId);
+  const sendMessageMutation = useSendMessage(selectedRoomId!);
+
+  const selectedRoom = rooms.find(room => room.id === selectedRoomId) || null;
 
   const handleSendMessage = (content: string) => {
-    const newMessage: ChatMessage = {
-      id: `m${messages.length + 1}`,
-      senderId: currentUserId,
-      senderName: "EcoPlast Recyclers",
-      senderType: "recycler",
-      content,
-      timestamp: new Date(),
-      isRead: true,
-    };
-    setMessages([...messages, newMessage]);
+    if (selectedRoomId) {
+      sendMessageMutation.mutate({ content, senderId: currentUserId });
+    }
   };
 
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      
+
       <main className="pt-16 h-screen flex">
         {/* Sidebar */}
         <div className="w-80 border-r border-border flex-shrink-0 hidden md:block">
           <ChatSidebar
-            rooms={mockChatRooms}
+            rooms={rooms}
             selectedRoomId={selectedRoomId}
             onSelectRoom={setSelectedRoomId}
           />
@@ -42,7 +51,7 @@ const Chat = () => {
         {/* Chat Window */}
         <ChatWindow
           room={selectedRoom}
-          messages={selectedRoomId === "room1" ? messages : []}
+          messages={messages}
           currentUserId={currentUserId}
           onSendMessage={handleSendMessage}
         />
@@ -51,7 +60,7 @@ const Chat = () => {
         {!selectedRoomId && (
           <div className="md:hidden absolute inset-x-0 top-16 bottom-0 bg-background">
             <ChatSidebar
-              rooms={mockChatRooms}
+              rooms={rooms}
               selectedRoomId={selectedRoomId}
               onSelectRoom={setSelectedRoomId}
             />
