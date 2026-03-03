@@ -37,3 +37,4 @@ npm run build
 - TypeScript
 - shadcn-ui
 - Tailwind CSS
+# EcoCycle
